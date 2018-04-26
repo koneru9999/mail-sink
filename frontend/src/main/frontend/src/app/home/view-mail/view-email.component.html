@@ -1,0 +1,21 @@
+<div class="jumbotron">
+    <dl class="row">
+        <dt class="col-sm-3">Subject</dt>
+        <dd class="col-sm-9">{{mail.subject}}</dd>
+
+        <dt class="col-sm-3">From</dt>
+        <dd class="col-sm-9">{{mail.from}}</dd>
+
+        <dt class="col-sm-3">To</dt>
+        <dd class="col-sm-9">{{mail.to}}</dd>
+
+        <dt class="col-sm-3">Sent</dt>
+        <dd class="col-sm-9">{{mail.sent | amLocale:'en' | amDateFormat:'MMMM Do YYYY, h:mm:ss a'}}</dd>
+    </dl>
+    <h3>Content:</h3>
+    <p>
+        {{mail.body}}
+    </p>
+
+    <button (click)="gotoHome()" type="button" class="btn btn-primary">Back</button>
+</div>

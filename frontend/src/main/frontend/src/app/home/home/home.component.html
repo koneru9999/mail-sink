@@ -1,0 +1,21 @@
+<p>Welcome!</p>
+<table class="table table-bordered table-striped table-hover">
+  <thead class="thead-dark">
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Date Time</th>
+    <th scope="col">Subject</th>
+    <th scope="col">To</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let mail of mails; let i = index;">
+      <td scope="row" [id]="i + 1 + ((page-1) * pageSize)"><a [routerLink]="['/mail', mail.messageId]">{{i + 1}}</a></td>
+      <td>{{mail.sent | amTimeAgo}}</td>
+      <td>{{mail.subject}}</td>
+      <td>{{mail.to}}</td>
+      <td><a [routerLink]="['/mail', mail.messageId]"><i class="fa fa-info-circle"></i></a></td>
+    </tr>
+  </tbody>
+</table>

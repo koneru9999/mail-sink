@@ -1,0 +1,10 @@
+server:
+  #port: 8080
+  servlet:
+    context-path: /mail-trap
+
+logging:
+  level:
+    root: INFO
+    org.springframeowrk: INFO
+    io.github.koneru9999: TRACE
