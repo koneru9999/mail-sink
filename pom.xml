@@ -12,7 +12,7 @@
     </modules>
     <packaging>pom</packaging>
 
-    <name>mail-sink</name>
+    <name>MailSink</name>
     <description>Simple SMTP trap for catching emails and displaying in the browser</description>
 
     <parent>
