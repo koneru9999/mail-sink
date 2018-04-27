@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.koneru9999</groupId>
-    <artifactId>mail-trap</artifactId>
+    <artifactId>mail-sink</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>frontend</module>
@@ -12,7 +12,7 @@
     </modules>
     <packaging>pom</packaging>
 
-    <name>mail-trap</name>
+    <name>mail-sink</name>
     <description>Simple SMTP trap for catching emails and displaying in the browser</description>
 
     <parent>
@@ -26,7 +26,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
     </properties>
 
     <dependencyManagement>

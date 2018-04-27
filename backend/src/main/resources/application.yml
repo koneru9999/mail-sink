@@ -1,7 +1,7 @@
 server:
   #port: 8080
   servlet:
-    context-path: /mail-trap
+    context-path: /mail-sink
 
 logging:
   level:
