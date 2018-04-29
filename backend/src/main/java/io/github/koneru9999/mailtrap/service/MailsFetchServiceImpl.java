@@ -5,7 +5,6 @@ import com.dumbster.smtp.SmtpMessage;
 import io.github.koneru9999.mailtrap.controller.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,14 +25,14 @@ public class MailsFetchServiceImpl implements MailsFetchService {
     }
 
     @Override
-    public Flux<Message> fetchEmails(Pageable page) {
+    public Flux<Message> fetchEmails(Integer pageNumber, Integer pageSize) {
         AtomicInteger ai = new AtomicInteger();
         return Flux.fromIterable( this.smtpServer.getReceivedEmails())
                 .filter(
                         x -> {
                             int i = ai.incrementAndGet();
-                            return i > Long.valueOf(page.getOffset()).intValue()
-                                    && i <= (page.getOffset() + page.getPageSize());
+                            return i > (pageNumber * pageSize)
+                                    && i <= ((pageNumber * pageSize) + pageSize);
                         }
                 )
                 .map(this::transform);

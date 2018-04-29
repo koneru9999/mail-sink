@@ -13,9 +13,7 @@
         <dd class="col-sm-9">{{mail.sent | amLocale:'en' | amDateFormat:'MMMM Do YYYY, h:mm:ss a'}}</dd>
     </dl>
     <h3>Content:</h3>
-    <p>
-        {{mail.body}}
-    </p>
+    <p [innerHTML] = "mail.body"></p>
 
     <button (click)="gotoHome()" type="button" class="btn btn-primary">Back</button>
 </div>

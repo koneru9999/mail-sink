@@ -1,12 +1,10 @@
 package io.github.koneru9999.mailtrap.config;
 
 import com.dumbster.smtp.SimpleSmtpServer;
-import com.dumbster.smtp.SmtpMessage;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Mono;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -16,10 +14,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
-
-import static com.sun.org.apache.xerces.internal.util.PropertyState.is;
 
 @Configuration
 public class SMTPConfiguration implements ApplicationRunner {
@@ -31,8 +26,10 @@ public class SMTPConfiguration implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        for (int i =0; i < 10; i++) {
-            sendMessage(getSmtpServer().getPort(), "sender@here.com", "Test" + (i+1), "Test Body", "receiver@there.com");
+        String mailBody = "<html><body><h1>Test body<h1><br>Hello user. <span>abcdefgh</span></body></html>";
+        for (int i = 0; i < 10; i++) {
+            sendMessage(getSmtpServer().getPort(), "sender@here.com",
+                    "Test" + (i + 1), mailBody, "receiver@there.com");
         }
     }
 
@@ -44,7 +41,8 @@ public class SMTPConfiguration implements ApplicationRunner {
         return mailProps;
     }
 
-    private void sendMessage(int port, String from, String subject, String body, String to) throws MessagingException {
+    private void sendMessage(int port, String from, String subject, String body, String to)
+            throws MessagingException {
         Properties mailProps = getMailProperties(port);
         Session session = Session.getInstance(mailProps, null);
         //session.setDebug(true);

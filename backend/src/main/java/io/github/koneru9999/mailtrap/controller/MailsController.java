@@ -2,8 +2,11 @@ package io.github.koneru9999.mailtrap.controller;
 
 import io.github.koneru9999.mailtrap.service.MailsFetchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,7 +22,7 @@ public class MailsController {
     @GetMapping("/mails")
     public Flux<Message> retrieveAllMails(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                           @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        return mailsFetchService.fetchEmails(PageRequest.of(page > 0 ? page - 1 : 0, size));
+        return mailsFetchService.fetchEmails(page > 0 ? page - 1 : 0, size);
     }
 
     @DeleteMapping("/reset")
