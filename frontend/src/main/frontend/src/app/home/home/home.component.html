@@ -10,12 +10,18 @@
   </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let mail of mails; let i = index;">
-      <td scope="row" [id]="i + 1 + ((page-1) * pageSize)"><a [routerLink]="['/mail', mail.messageId]">{{i + 1}}</a></td>
-      <td>{{mail.sent | amTimeAgo}}</td>
-      <td>{{mail.subject}}</td>
-      <td>{{mail.to}}</td>
-      <td><a [routerLink]="['/mail', mail.messageId]"><i class="fa fa-info-circle"></i></a></td>
-    </tr>
+  <tr *ngFor="let mail of mails; let i = index;">
+    <td scope="row" [id]="i + 1 + ((page-1) * pageSize)"><a [routerLink]="['/mail', mail.messageId]">{{ i + 1 + ((page-1) * pageSize)}}</a></td>
+    <td>{{mail.sent | amTimeAgo}}</td>
+    <td>{{mail.subject}}</td>
+    <td>{{mail.to}}</td>
+    <td><a [routerLink]="" (click)="viewEmailContent($event, mail)"><i class="fa fa-info-circle"></i></a></td>
+  </tr>
   </tbody>
 </table>
+<ngb-pagination class="d-flex justify-content-center" [collectionSize]="totalCount"
+                [(page)]="page"
+                [boundaryLinks]="true"
+                [pageSize]="pageSize"
+                (pageChange)="fetchMails()"></ngb-pagination>
+<button class="btn btn-primary" (click)="clearMails()">Clear Mails</button>

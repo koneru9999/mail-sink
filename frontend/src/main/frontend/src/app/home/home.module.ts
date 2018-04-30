@@ -1,6 +1,8 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { HomeComponent } from './home/home.component';
 import { ViewMailComponent } from './view-mail/view-mail.component';
 import { MomentModule } from 'ngx-moment';
@@ -30,6 +32,7 @@ const homeRouting: ModuleWithProviders = RouterModule.forChild([
   imports: [
     CommonModule,
     MomentModule,
+    NgbModule,
     homeRouting
   ],
   declarations: [

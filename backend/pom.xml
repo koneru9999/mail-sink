@@ -9,7 +9,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>backend</artifactId>
-    <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -45,15 +44,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.kirviq</groupId>
-            <artifactId>dumbster</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
@@ -85,10 +75,14 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.5.5</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <finalName>${parent.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

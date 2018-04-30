@@ -1,64 +1,38 @@
 package io.github.koneru9999.mailtrap.config;
 
-import com.dumbster.smtp.SimpleSmtpServer;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Properties;
+import reactor.core.publisher.Flux;
 
 @Configuration
+@Slf4j
 public class SMTPConfiguration implements ApplicationRunner {
 
-    @Bean
-    public SimpleSmtpServer getSmtpServer() throws IOException {
-        return SimpleSmtpServer.start(1025);
+    @Bean(destroyMethod = "stop")
+    public GreenMail greenMail() {
+        GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP);
+        greenMail.start();
+
+        return greenMail;
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         String mailBody = "<html><body><h1>Test body<h1><br>Hello user. <span>abcdefgh</span></body></html>";
-        for (int i = 0; i < 10; i++) {
-            sendMessage(getSmtpServer().getPort(), "sender@here.com",
-                    "Test" + (i + 1), mailBody, "receiver@there.com");
-        }
-    }
-
-    private Properties getMailProperties(int port) {
-        Properties mailProps = new Properties();
-        mailProps.setProperty("mail.smtp.host", "localhost");
-        mailProps.setProperty("mail.smtp.port", "" + port);
-        mailProps.setProperty("mail.smtp.sendpartial", "true");
-        return mailProps;
-    }
-
-    private void sendMessage(int port, String from, String subject, String body, String to)
-            throws MessagingException {
-        Properties mailProps = getMailProperties(port);
-        Session session = Session.getInstance(mailProps, null);
-        //session.setDebug(true);
-
-        MimeMessage msg = createMessage(session, from, to, subject, body);
-        Transport.send(msg);
-    }
-
-    private MimeMessage createMessage(
-            Session session, String from, String to, String subject, String body) throws MessagingException {
-        MimeMessage msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(from));
-        msg.setSubject(subject);
-        msg.setSentDate(new Date());
-        msg.setText(body);
-        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-        return msg;
+        Flux.range(0, 57)
+                .map((x) -> {
+                    GreenMailUtil.sendMessageBody("receiver@there.com", "sender@here.com",
+                            "Test" + (x + 1), mailBody, "text/html", ServerSetupTest.SMTP);
+                    return x;
+                })
+                .doOnComplete(() -> log.info("Initial Data completed"))
+                .subscribe();
     }
 }

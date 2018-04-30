@@ -35,8 +35,8 @@ public class MailsController {
         return mailsFetchService.getById(messageId);
     }
 
-    @DeleteMapping(value = "/mails/{id}")
-    public Mono<Void> deleteMail(@PathVariable(name = "id") String messageId) {
-        return mailsFetchService.deleteById(messageId);
+    @GetMapping("/mails/count")
+    public Mono<Integer> count() {
+        return mailsFetchService.count();
     }
 }

@@ -1,7 +1,7 @@
 package io.github.koneru9999.mailtrap.service;
 
-import com.dumbster.smtp.SimpleSmtpServer;
-import com.dumbster.smtp.SmtpMessage;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
 import io.github.koneru9999.mailtrap.controller.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,82 +9,94 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @Slf4j
 public class MailsFetchServiceImpl implements MailsFetchService {
-    private static final String pattern = "EEE, dd MMM yyyy HH:mm:ss Z";
-    private final SimpleSmtpServer smtpServer;
+    private final GreenMail smtpServer;
 
     @Autowired
-    public MailsFetchServiceImpl(SimpleSmtpServer smtpServer) {
+    public MailsFetchServiceImpl(GreenMail smtpServer) {
         this.smtpServer = smtpServer;
     }
 
     @Override
     public Flux<Message> fetchEmails(Integer pageNumber, Integer pageSize) {
-        AtomicInteger ai = new AtomicInteger();
-        return Flux.fromIterable( this.smtpServer.getReceivedEmails())
-                .filter(
-                        x -> {
-                            int i = ai.incrementAndGet();
-                            return i > (pageNumber * pageSize)
-                                    && i <= ((pageNumber * pageSize) + pageSize);
-                        }
-                )
-                .map(this::transform);
+        List<MimeMessage> emails = Arrays.asList(this.smtpServer.getReceivedMessages());
+        long toSkip = pageNumber * pageSize;
+        long take = pageNumber * pageSize > emails.size() ? emails.size() % pageSize : pageSize;
+        return Flux.fromIterable(emails)
+                .skip(toSkip)
+                .take(take)
+                .map(this::transform)
+                .doOnError((error) -> log.error(error.getMessage(), error))
+                .doOnComplete(() -> log.info("returned {} records for page {}", take, pageNumber));
     }
 
     @Override
     public Mono<Void> clearMessages() {
         return Mono.create(x -> {
-            this.smtpServer.reset();
-            x.success();
-        }).flatMap((p) -> Mono.empty());
+            try {
+                this.smtpServer.purgeEmailFromAllMailboxes();
+                x.success();
+            } catch (FolderException e) {
+                x.error(e);
+            }
+        }).then()
+                .doOnSuccess((viod) -> log.info("Cleared all messages"))
+                .doOnError((error) -> log.error(error.getMessage(), error));
     }
 
     @Override
     public Mono<Message> getById(String messageId) {
-        return Flux.fromIterable(this.smtpServer.getReceivedEmails())
-                .filter((x) -> x.getHeaderValue("Message-ID").equalsIgnoreCase(messageId))
-                .reduce((a, b) -> b)
-                .map(this::transform);
+        return Flux.fromArray(this.smtpServer.getReceivedMessages())
+                .filter((x) -> {
+                    try {
+                        return x.getMessageID().equalsIgnoreCase(messageId);
+                    } catch (MessagingException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                    return false;
+                })
+                .single()
+                .map(this::transform)
+                .doOnSuccess((success) -> log.info("returned message {}", messageId))
+                .doOnError((error) -> log.error(error.getMessage(), error))
+                .onErrorReturn(null);
     }
 
     @Override
-    public Mono<Void> deleteById(String messageId) {
-        return Flux.fromIterable(this.smtpServer.getReceivedEmails())
-                .filter((x) -> x.getHeaderValue("Message-ID").equalsIgnoreCase(messageId))
-                .reduce((a, b) -> b)
-                .doOnNext((x) -> {
-                  this.smtpServer.getReceivedEmails().remove(x);
-                })
-                .then();
+    public Mono<Integer> count() {
+        return Mono.just(this.smtpServer.getReceivedMessages().length)
+                .doOnSuccess((success) -> log.info("returned count {}", success))
+                .doOnError((error) -> log.error(error.getMessage(), error));
     }
 
     /**
-     *
-     * @param smtpMessage
+     * @param mimeMessage
      * @return
      */
-    private Message transform(SmtpMessage smtpMessage) {
-        SimpleDateFormat format = new SimpleDateFormat(pattern);
-        Message message = new Message();
-        message.setBody(smtpMessage.getBody());
-        message.setSubject(smtpMessage.getHeaderValue("Subject"));
-        message.setFrom(smtpMessage.getHeaderValue("From"));
+    private Message transform(MimeMessage mimeMessage) {
         try {
-            message.setSent(format.parse(smtpMessage.getHeaderValue("Date")));
-        } catch (ParseException e) {
-            log.error("", e);
+            Message message = new Message();
+            message.setBody(mimeMessage.getContent().toString());
+            message.setSubject(mimeMessage.getSubject());
+            message.setFrom(mimeMessage.getFrom()[0]);
+            message.setSent(mimeMessage.getSentDate());
+            message.setTo(mimeMessage.getRecipients(javax.mail.Message.RecipientType.TO));
+            message.setCc(mimeMessage.getRecipients(javax.mail.Message.RecipientType.CC));
+            message.setMessageId(mimeMessage.getMessageID());
+            message.setContentId(mimeMessage.getContentID());
+            message.setContentType(mimeMessage.getContentType());
+            return message;
+        } catch (MessagingException | IOException e) {
+            log.error(e.getMessage(), e);
         }
-        message.setTo(new String[]{smtpMessage.getHeaderValue("To")});
-        message.setCc(new String[]{smtpMessage.getHeaderValue("Cc")});
-        message.setMessageId(smtpMessage.getHeaderValue("Message-ID"));
-        message.setContentType(smtpMessage.getHeaderValue("Content-Type"));
-        return message;
+        return null;
     }
 }

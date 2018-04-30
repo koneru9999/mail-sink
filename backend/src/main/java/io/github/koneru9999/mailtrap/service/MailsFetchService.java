@@ -12,5 +12,5 @@ public interface MailsFetchService {
 
     Mono<Message> getById(String messageId);
 
-    Mono<Void> deleteById(String messageId);
+    Mono<Integer> count();
 }
