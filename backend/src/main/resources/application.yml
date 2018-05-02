@@ -8,3 +8,6 @@ logging:
     root: INFO
     org.springframeowrk: INFO
     io.github.koneru9999: TRACE
+
+mailsink:
+  dummy-data-size: 56 # > 0 for enabling dummy data
