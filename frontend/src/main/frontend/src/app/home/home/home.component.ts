@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import {SmtpMailService} from '../../shared/services/smtp-mail.service';
 import {SmtpMail} from '../../shared/models/smtp-mail.model';
 import {Subscription} from 'rxjs/Subscription';
+import {Observable} from "rxjs/Observable";
 
 @Component({
   selector: 'app-home',
@@ -11,9 +12,9 @@ import {Subscription} from 'rxjs/Subscription';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  mails: SmtpMail[] = [];
+  mails: Observable<SmtpMail[]>;
   page = 1;
-  pageSize = 5;
+  pageSize = 10;
   totalCount = 0;
   sub: Subscription[] = [];
 
@@ -27,17 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   fetchMails() {
-    this.sub.push(
-      this.mailService.getMails(this.page, this.pageSize).subscribe(
-        (data) => {
-          this.mails = data;
-        },
-        err => {
-          console.log(err);
-        }
-      )
-    );
-
+    this.mails = this.mailService.getMails(this.page, this.pageSize);
     this.getCount();
   }
 
@@ -59,8 +50,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   viewEmailContent(event: Event, mail: SmtpMail) {
-    event.preventDefault;
-    console.log(mail.messageId);
+    event.preventDefault();
     this.router.navigate(['/mail', encodeURI(mail.messageId)])
   }
 
