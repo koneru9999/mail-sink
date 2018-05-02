@@ -31,6 +31,14 @@ public class MailsFetchServiceImpl implements MailsFetchService {
         long toSkip = pageNumber * pageSize;
         long take = pageNumber * pageSize > emails.size() ? emails.size() % pageSize : pageSize;
         return Flux.fromIterable(emails)
+                .sort((msg1, msg2) -> {
+                    try {
+                        return msg1.getSentDate().getTime() > msg2.getSentDate().getTime() ? -1 : 1;
+                    } catch (MessagingException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                    return -1;
+                })
                 .skip(toSkip)
                 .take(take)
                 .map(this::transform)
