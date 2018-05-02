@@ -37,7 +37,7 @@ public class MailsFetchServiceImpl implements MailsFetchService {
                     } catch (MessagingException e) {
                         log.error(e.getMessage(), e);
                     }
-                    return -1;
+                    return 1;
                 })
                 .skip(toSkip)
                 .take(take)
