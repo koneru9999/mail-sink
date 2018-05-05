@@ -1,0 +1,21 @@
+sudo: false
+services:
+  - docker
+language: java
+jdk:
+  - oraclejdk8
+cache:
+  directories:
+    - "$HOME/.m2"
+script: mvn clean package
+after_success:
+  - if [ -n "$TRAVIS_TAG" ]; then
+      mvn package -B -U -DperformRelease=true -DskipTests=true;
+      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      docker push $DOCKER_USERNAME/mail-sink:$TRAVIS_TAG
+      docker push $DOCKER_USERNAME/mail-sink:latest
+    fi
+env:
+  global:
+    - secure: PyFI/yfjVu5RtLQBMdyjbz4NLh0nR+fUa8cM+zPebgQ7kgqvgFWntHYjNbr/WzhGRIihPSQisA4uCkXdoJEPT1OSXUkLGwNi780EjsK2yj1OuPtILrcHmngtXMxq2fEDcBlXsFIycA0gwSDRStJ5OBxBgz4SnltcPXF7W/HV2am3AhaOLYCskyWhoNScp2SQdpobIJaQADw7MalEYQ0oOPstM18oLPTj/5yWujQ7gVagBKuoVTKXJE66rDZ1apt67zEtPaM8kiAzi3b4FBEoEyBrukwXGqbUE1afv2ON3C9WwLQsDpCEAeNdrT6KBAzaY8/oxq1xJrxWg6ETVH1rb6Q74ED/UP+Npj8N13CpzO4jqqROa5RELYjAd/+CsoB6Ydh8DDHIcf4NIFYGf8IXFK6JCjRb+t/3JSGG48BGxrf4iEWVwJKtE1XN47gY4xsVicTrMOJ4ktYMU5ucVQNFL+eWY0UFYbqg0Qlf6IF2KsT4Y1RPK8duzTXv0KWTO3ywD3qqE2a5KbEeMKr5kpB9Iuut02pPONYRDB/saYfyatJAcOejJcPLrK0XPWviY/xE2VX3ksbp9ctw9qDTWLmk3Iw4XLTGxU9RbJk66OafQ1YQLeuEUTu2DN0B6CRR8RyRN16PoS/0jyN9KfYnwsEQM8zfZYtGNZQ1tQLGpxagWVc=
+    - secure: NEpC69AR4AzdaL5cSJ3tZpV7sNBBqcyyisYWXNOA9qcJrUjxV0/gyHcynjvMnlR7Np871Gq5SftlRm9E0GeoAKIPtTDFzwxbchuIMBhaCzm9K0VxsnBxiIqFzNGhzB+kMiVG6x/s9Jd3M6Nn1wFUKvaZlKzylvsqpFwQIq4AMHrsv2xInyRQ0q4o89SJ8YvOCo06Q03atsK6WL21fDjUvCY8xvFRnSe2rzfrERLW5W8tc9WzaGyxlBkYwpDwSCPbNljje6TJBftj8iN6ZtfoO0wyrcyi4t+ufYyMXk4+SkBtb5rABDzxOzc7SrzzV42qGUFhtFo1caBeewLRgJyjpAQqo7X6x51XyYsJNmTxP7xrqac68LYXP8cTqkYWj/G9T6fGPm2tG6CdWXvtbK2BPgeEOQNjVr7vkUY8LteO53wJ8qq2d8izGUnuwQNHaEah5WCLTg/EJ3Aby/oeT9m1WAeiEGGqncFzO+alGEhdbfmuDZLbRS5TENgJIoG41iFZ0jjifjGD3En7XwuFBhhyNASWQWsTKmvnkeMdi4el6MqSvvkKiUdFxo67HkPfzd4DJvPQ1tQURybKL/bAJCr+tApdtRL3mdCu7HCZllvDhE+Gb0aSI3KpjqdntTxZn+WaCzgdxg4WuxVhFjZd+9a4h49x8ujcNX029XAJok7jJuQ=
