@@ -12,7 +12,7 @@ after_success:
   - if [ -n "$TRAVIS_TAG" ]; then
         mvn package -B -U -DperformRelease=true -DskipTests=true;
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-        docker push $DOCKER_USERNAME/mail-sink:$TRAVIS_TAGa[1..-1];
+        docker push $DOCKER_USERNAME/mail-sink:$TRAVIS_TAG[1..-1];
         docker push $DOCKER_USERNAME/mail-sink:latest;
     fi
 env:
