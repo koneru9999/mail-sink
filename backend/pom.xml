@@ -106,14 +106,15 @@
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>1.0.0</version>
                         <configuration>
-                            <imageName>${project.artifactId}</imageName>
+                            <imageName>${project.parent.artifactId}</imageName>
                             <forceTags>true</forceTags>
+                            <dockerExposes>8080</dockerExposes>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
                                 <imageTag>latest</imageTag>
                             </imageTags>
                             <maintainer>Venakaiah Chowdary Koneru (koneru.chowdary@gmail.com)</maintainer>
-                            <baseImage>java</baseImage>
+                            <baseImage>openjdk:8-jre-alpine</baseImage>
                             <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
                             <!-- copy the service's jar file from target into the root directory of the image -->
                             <resources>
@@ -139,8 +140,8 @@
                                     <goal>tag</goal>
                                 </goals>
                                 <configuration>
-                                    <image>${project.artifactId}</image>
-                                    <newName>${DOCKER_USERNAME}/${project.artifactId}</newName>
+                                    <image>${project.parent.artifactId}</image>
+                                    <newName>${DOCKER_USERNAME}/${project.parent.artifactId}</newName>
                                 </configuration>
                             </execution>
                         </executions>
