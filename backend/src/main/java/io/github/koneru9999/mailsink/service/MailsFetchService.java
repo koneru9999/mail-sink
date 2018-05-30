@@ -1,6 +1,6 @@
-package io.github.koneru9999.mailtrap.service;
+package io.github.koneru9999.mailsink.service;
 
-import io.github.koneru9999.mailtrap.controller.Message;
+import io.github.koneru9999.mailsink.controller.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

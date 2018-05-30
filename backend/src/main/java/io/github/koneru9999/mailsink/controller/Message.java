@@ -1,4 +1,4 @@
-package io.github.koneru9999.mailtrap.controller;
+package io.github.koneru9999.mailsink.controller;
 
 import lombok.Data;
 

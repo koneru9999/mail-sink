@@ -1,8 +1,8 @@
-package io.github.koneru9999.mailtrap.service;
+package io.github.koneru9999.mailsink.service;
 
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
-import io.github.koneru9999.mailtrap.controller.Message;
+import io.github.koneru9999.mailsink.controller.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

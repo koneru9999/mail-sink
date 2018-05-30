@@ -1,9 +1,10 @@
-package io.github.koneru9999.mailtrap.config;
+package io.github.koneru9999.mailsink.config;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import io.github.koneru9999.mailtrap.properties.MailSinkProperties;
+import io.github.koneru9999.mailsink.properties.MailSinkProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -25,7 +26,8 @@ public class SMTPConfiguration implements ApplicationRunner {
 
     @Bean(destroyMethod = "stop")
     public GreenMail greenMail() {
-        GreenMail greenMail = new GreenMail(ServerSetupTest.SMTP);
+        GreenMail greenMail = new GreenMail(new ServerSetup(3025, "0.0.0.0",
+                ServerSetup.PROTOCOL_SMTP));
         greenMail.start();
 
         return greenMail;

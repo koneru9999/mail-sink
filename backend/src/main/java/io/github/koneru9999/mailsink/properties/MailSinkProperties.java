@@ -1,4 +1,4 @@
-package io.github.koneru9999.mailtrap.properties;
+package io.github.koneru9999.mailsink.properties;
 
 import lombok.Getter;
 import lombok.Setter;

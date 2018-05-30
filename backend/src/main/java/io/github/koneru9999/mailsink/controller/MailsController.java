@@ -1,6 +1,6 @@
-package io.github.koneru9999.mailtrap.controller;
+package io.github.koneru9999.mailsink.controller;
 
-import io.github.koneru9999.mailtrap.service.MailsFetchService;
+import io.github.koneru9999.mailsink.service.MailsFetchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

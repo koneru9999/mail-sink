@@ -1,4 +1,4 @@
-package io.github.koneru9999.mailtrap.config;
+package io.github.koneru9999.mailsink.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
