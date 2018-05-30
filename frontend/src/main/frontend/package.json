@@ -1,5 +1,5 @@
 {
-  "name": "mail-trap",
+  "name": "mail-sink",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
