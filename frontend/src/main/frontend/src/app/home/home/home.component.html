@@ -15,7 +15,7 @@
     <ng-template #tooltip>{{mail.sent | amDateFormat:'MMMM Do YYYY, h:mm:ss a'}}</ng-template>
     <td placement="top" [ngbTooltip]="tooltip" container="body">{{mail.sent | amTimeAgo}}</td>
     <td>{{mail.subject}}</td>
-    <td>{{mail.to}}</td>
+    <td>{{fetchEmailAddress(mail.to)}}</td>
     <td><a [routerLink]="['/mail', mail.messageId]" (click)="viewEmailContent($event, mail)"><i class="fa fa-info-circle"></i></a></td>
   </tr>
   </tbody>

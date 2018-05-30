@@ -5,6 +5,7 @@ import {SmtpMailService} from '../../shared/services/smtp-mail.service';
 import {SmtpMail} from '../../shared/models/smtp-mail.model';
 import {Subscription} from 'rxjs/Subscription';
 import {Observable} from "rxjs/Observable";
+import {InetAddress} from "../../shared/models/inet-address.model";
 
 @Component({
   selector: 'app-home',
@@ -52,6 +53,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   viewEmailContent(event: Event, mail: SmtpMail) {
     event.preventDefault();
     this.router.navigate(['/mail', encodeURI(mail.messageId)])
+  }
+
+  fetchEmailAddress(recipient: InetAddress | InetAddress[]): string {
+    if (recipient instanceof Array) {
+      let retEmail = [];
+      retEmail = recipient.reduce( function(coll,item){
+        coll.push( item.address );
+        return coll;
+      }, retEmail);
+
+      return retEmail.join(',');
+    } else {
+      return recipient.address;
+    }
   }
 
   ngOnDestroy() {

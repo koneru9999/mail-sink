@@ -8,13 +8,10 @@ import 'rxjs/add/operator/pairwise';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'app';
-
   constructor(private router: Router) {
     this.router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
         window.scrollTo(0, 0);
-        console.log('scrolled');
       }
   });
   }
