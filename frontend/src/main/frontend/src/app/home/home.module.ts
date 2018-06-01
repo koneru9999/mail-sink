@@ -7,6 +7,7 @@ import { HomeComponent } from './home/home.component';
 import { ViewMailComponent } from './view-mail/view-mail.component';
 import { MomentModule } from 'ngx-moment';
 import { SmtpMailService } from '../shared/services/smtp-mail.service';
+import {PipesModule} from "../pipes/pipes.module";
 
 const homeRouting: ModuleWithProviders = RouterModule.forChild([
   {
@@ -33,7 +34,8 @@ const homeRouting: ModuleWithProviders = RouterModule.forChild([
     CommonModule,
     MomentModule,
     NgbModule,
-    homeRouting
+    homeRouting,
+    PipesModule
   ],
   declarations: [
     HomeComponent,

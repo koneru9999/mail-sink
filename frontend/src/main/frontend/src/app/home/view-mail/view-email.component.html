@@ -5,10 +5,10 @@
         <dd class="col-sm-9">{{mail.subject}}</dd>
 
         <dt class="col-sm-3">From</dt>
-        <dd class="col-sm-9">{{fetchEmailAddress(mail.from)}}</dd>
+        <dd class="col-sm-9">{{mail.from | recipient}}</dd>
 
         <dt class="col-sm-3">To</dt>
-        <dd class="col-sm-9">{{fetchEmailAddress(mail.to)}}</dd>
+        <dd class="col-sm-9">{{mail.to | recipient}}</dd>
 
         <dt class="col-sm-3">Sent</dt>
         <dd class="col-sm-9">{{mail.sent | amLocale:'en' | amDateFormat:'MMMM Do YYYY, h:mm:ss a'}}</dd>

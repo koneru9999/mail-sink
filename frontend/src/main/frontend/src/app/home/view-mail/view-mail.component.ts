@@ -4,7 +4,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {SmtpMailService} from '../../shared/services/smtp-mail.service';
 import {SmtpMail} from '../../shared/models/smtp-mail.model';
 import {Subscription} from 'rxjs/Subscription';
-import {InetAddress} from "../../shared/models/inet-address.model";
 
 @Component({
   selector: 'app-view-mail',
@@ -15,6 +14,7 @@ export class ViewMailComponent implements OnInit, OnDestroy {
   mail: SmtpMail;
   sub: Subscription[] = [];
   id: string;
+  fromPage: number;
 
   constructor(
     private mailService: SmtpMailService,
@@ -29,6 +29,10 @@ export class ViewMailComponent implements OnInit, OnDestroy {
         this.search();
       })
     );
+
+    if (this.route.snapshot.queryParamMap.has('fp')) {
+      this.fromPage = +this.route.snapshot.queryParamMap.get('fp');
+    }
   }
 
   search() {
@@ -43,21 +47,12 @@ export class ViewMailComponent implements OnInit, OnDestroy {
   }
 
   gotoHome() {
-    this.router.navigate(['/mail-list']);
-  }
-
-  fetchEmailAddress(recipient: InetAddress | InetAddress[]): string {
-    if (recipient instanceof Array) {
-      let retEmail = [];
-      retEmail = recipient.reduce( function(coll,item){
-        coll.push( item.address );
-        return coll;
-      }, retEmail);
-
-      return retEmail.join(',');
-    } else {
-      return recipient.address;
-    }
+    this.router.navigate(['/mail-list'], this.fromPage ? {
+        queryParams: {
+          ['page']: this.fromPage
+        }
+      } : {}
+    );
   }
 
   ngOnDestroy() {

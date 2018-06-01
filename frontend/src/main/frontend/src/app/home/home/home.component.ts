@@ -1,11 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 import {SmtpMailService} from '../../shared/services/smtp-mail.service';
 import {SmtpMail} from '../../shared/models/smtp-mail.model';
 import {Subscription} from 'rxjs/Subscription';
 import {Observable} from "rxjs/Observable";
-import {InetAddress} from "../../shared/models/inet-address.model";
 
 @Component({
   selector: 'app-home',
@@ -14,18 +13,34 @@ import {InetAddress} from "../../shared/models/inet-address.model";
 })
 export class HomeComponent implements OnInit, OnDestroy {
   mails: Observable<SmtpMail[]>;
-  page = 1;
+  page: number;
   pageSize = 10;
   totalCount = 0;
   sub: Subscription[] = [];
 
   constructor(
     private mailService: SmtpMailService,
+    private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
-    this.fetchMails();
+    if (this.route.snapshot.queryParamMap.has('page')) {
+      this.page = +this.route.snapshot.queryParamMap.get('page');
+    } else {
+      this.page = 1;
+    }
+
+    this.sub.push(this.route.queryParamMap.subscribe(
+      paramMap => {
+        if (paramMap.has('page')) {
+          this.page = +paramMap.get('page');
+        }
+
+        this.fetchMails();
+      }
+    ));
   }
 
   fetchMails() {
@@ -33,11 +48,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.getCount();
   }
 
+  onPageChange(event: number) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParamsHandling: 'merge',
+      queryParams: {
+        ['page']: event
+      }
+    });
+  }
+
   clearMails() {
     this.sub.push(
       this.mailService.clearMails()
         .subscribe(
-          (data) => this.fetchMails()
+          (data) => this.router.navigate([], {
+            relativeTo: this.route,
+            queryParamsHandling: 'merge',
+            queryParams: {
+              ['page']: undefined
+            }
+          })
         )
     );
   }
@@ -52,21 +83,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   viewEmailContent(event: Event, mail: SmtpMail) {
     event.preventDefault();
-    this.router.navigate(['/mail', encodeURI(mail.messageId)])
-  }
-
-  fetchEmailAddress(recipient: InetAddress | InetAddress[]): string {
-    if (recipient instanceof Array) {
-      let retEmail = [];
-      retEmail = recipient.reduce( function(coll,item){
-        coll.push( item.address );
-        return coll;
-      }, retEmail);
-
-      return retEmail.join(',');
-    } else {
-      return recipient.address;
-    }
+    this.router.navigate(['/mail', encodeURI(mail.messageId)], {
+      queryParams: {
+        ['fp']: this.page
+      }
+    });
   }
 
   ngOnDestroy() {

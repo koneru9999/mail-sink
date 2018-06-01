@@ -12,8 +12,8 @@ import reactor.core.publisher.Mono;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -27,10 +27,10 @@ public class MailsFetchServiceImpl implements MailsFetchService {
 
     @Override
     public Flux<Message> fetchEmails(Integer pageNumber, Integer pageSize) {
-        List<MimeMessage> emails = Arrays.asList(this.smtpServer.getReceivedMessages());
+        MimeMessage[] mimeMessages = this.smtpServer.getReceivedMessages();
         long toSkip = pageNumber * pageSize;
-        long take = pageNumber * pageSize > emails.size() ? emails.size() % pageSize : pageSize;
-        return Flux.fromIterable(emails)
+        long take = pageNumber * pageSize > mimeMessages.length ? mimeMessages.length % pageSize : pageSize;
+        return Flux.fromIterable(removeDuplicates(mimeMessages).values())
                 .sort((msg1, msg2) -> {
                     try {
                         return msg1.getSentDate().getTime() > msg2.getSentDate().getTime() ? -1 : 1;
@@ -56,7 +56,7 @@ public class MailsFetchServiceImpl implements MailsFetchService {
                 x.error(e);
             }
         }).then()
-                .doOnSuccess((viod) -> log.info("Cleared all messages"))
+                .doOnSuccess((x) -> log.info("Cleared all messages"))
                 .doOnError((error) -> log.error(error.getMessage(), error));
     }
 
@@ -71,8 +71,9 @@ public class MailsFetchServiceImpl implements MailsFetchService {
                     }
                     return false;
                 })
-                .single()
+                .take(1)
                 .map(this::transform)
+                .single()
                 .doOnSuccess((success) -> log.info("returned message {}", messageId))
                 .doOnError((error) -> log.error(error.getMessage(), error))
                 .onErrorReturn(null);
@@ -80,7 +81,7 @@ public class MailsFetchServiceImpl implements MailsFetchService {
 
     @Override
     public Mono<Integer> count() {
-        return Mono.just(this.smtpServer.getReceivedMessages().length)
+        return Mono.just(removeDuplicates(this.smtpServer.getReceivedMessages()).size())
                 .doOnSuccess((success) -> log.info("returned count {}", success))
                 .doOnError((error) -> log.error(error.getMessage(), error));
     }
@@ -106,5 +107,25 @@ public class MailsFetchServiceImpl implements MailsFetchService {
             log.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * @param arr
+     * @return
+     */
+    private Map<String, MimeMessage> removeDuplicates(MimeMessage[] arr) {
+        Map<String, MimeMessage> alreadyPresent = new HashMap<>();
+
+        for (MimeMessage nextElem : arr) {
+            try {
+                if (!alreadyPresent.containsKey(nextElem.getMessageID())) {
+                    alreadyPresent.put(nextElem.getMessageID(), nextElem);
+                }
+            } catch (MessagingException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+
+        return alreadyPresent;
     }
 }

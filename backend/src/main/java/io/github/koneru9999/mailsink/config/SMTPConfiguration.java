@@ -39,7 +39,7 @@ public class SMTPConfiguration implements ApplicationRunner {
             String mailBody = "<html><body><h1>Test body<h1><br>Hello user. <span>abcdefgh</span></body></html>";
             Flux.range(0, mailSinkProperties.getDummyDataSize())
                     .map((x) -> {
-                        GreenMailUtil.sendMessageBody("receiver@there.com", "sender@here.com",
+                        GreenMailUtil.sendMessageBody("receiver@there.com,receiver2@there.com", "sender@here.com",
                                 "Test" + (x + 1), mailBody, "text/html", ServerSetupTest.SMTP);
                         return x;
                     })
