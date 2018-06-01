@@ -10,4 +10,4 @@ logging:
     io.github.koneru9999: TRACE
 
 mailsink:
-  dummy-data-size: ${DUMMY_DATA_SIZE: 0} # > 0 for enabling dummy data
+  dummy-data-size: ${DUMMY_DATA_SIZE:0} # > 0 for enabling dummy data
